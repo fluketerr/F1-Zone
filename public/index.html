@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F1 ZONE | ศูนย์รวมแฟน Formula 1</title>
+<meta name="description" content="F1 ZONE — เว็บแฟนเพจ Formula 1 ที่ดึงข้อมูลจริงจาก OpenF1 API: ปฏิทิน อันดับ ทีมนักแข่ง และนับถอยหลังสนามถัดไป">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏎️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="demoBanner" class="demo-banner" hidden></div>
+
+<nav id="nav">
+  <div class="nav-inner">
+    <a class="logo" href="#top">F1<b>ZONE</b></a>
+    <div class="nav-links">
+      <a href="#teams">ทีมแข่ง</a>
+      <a href="#standings">อันดับ</a>
+      <a href="#calendar">ปฏิทิน</a>
+      <a href="#facts">ยุคใหม่ 2026</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-inner">
+    <p class="season-tag">Formula 1 · ข้อมูลจริงจาก OpenF1 API</p>
+    <h1>F1 <span>ZONE</span></h1>
+    <p class="tagline">ศูนย์รวมทุกความเร็ว — ปฏิทินการแข่งขัน อันดับคะแนนสะสม ทีมและนักแข่งตัวจริง อัปเดตจากข้อมูลการแข่งขันจริงของสนามล่าสุด</p>
+
+    <div class="lights" id="lights">
+      <div class="light-col"><div class="light"></div><div class="light"></div></div>
+      <div class="light-col"><div class="light"></div><div class="light"></div></div>
+      <div class="light-col"><div class="light"></div><div class="light"></div></div>
+      <div class="light-col"><div class="light"></div><div class="light"></div></div>
+      <div class="light-col"><div class="light"></div><div class="light"></div></div>
+    </div>
+    <button id="startBtn" type="button">🏎️ จำลองการออกตัว</button>
+    <p class="lights-msg" id="lightsMsg"></p>
+
+    <div class="countdown-card">
+      <p class="cd-title" id="cdTitle">กำลังโหลดตารางแข่ง…</p>
+      <div class="count">
+        <div class="cd-box"><div class="cd-num od" id="cdD">--</div><div class="cd-label">วัน</div></div>
+        <div class="cd-box"><div class="cd-num od" id="cdH">--</div><div class="cd-label">ชั่วโมง</div></div>
+        <div class="cd-box"><div class="cd-num od" id="cdM">--</div><div class="cd-label">นาที</div></div>
+        <div class="cd-box"><div class="cd-num od" id="cdS">--</div><div class="cd-label">วินาที</div></div>
+      </div>
+      <p class="cd-sub" id="cdSub"></p>
+    </div>
+  </div>
+  <div class="checkers"></div>
+</header>
+
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<section id="live" style="padding-top:56px">
+  <div id="liveStrip" class="live-strip"><span class="skeleton" style="width:60%;height:20px"></span></div>
+</section>
+
+<section>
+  <div class="stats">
+    <div class="stat"><div class="stat-num od" id="statDone">–</div><div class="stat-label">สนามที่แข่งแล้ว</div></div>
+    <div class="stat"><div class="stat-num od" id="statTotal">–</div><div class="stat-label">สนามทั้งฤดูกาล</div></div>
+    <div class="stat"><div class="stat-num od" id="statTeams">–</div><div class="stat-label">ทีมผู้ผลิต</div></div>
+    <div class="stat"><div class="stat-num od" id="statDrivers">–</div><div class="stat-label">นักแข่งบนกริด</div></div>
+    <div class="stat"><div class="stat-num od">1000+</div><div class="stat-label">แรงม้า (hp) ต่อคัน</div></div>
+  </div>
+</section>
+
+<section id="podium" hidden>
+  <div class="sec-head">
+    <p class="sec-kicker">Latest Race</p>
+    <h2 id="podiumTitle">ผลการแข่งขันสนามล่าสุด</h2>
+    <p id="podiumSub">ข้อมูลจากผลการแข่งขันจริงบน OpenF1</p>
+  </div>
+  <div class="podium" id="podiumWrap"></div>
+</section>
+
+<section id="teams">
+  <div class="sec-head">
+    <p class="sec-kicker">The Grid</p>
+    <h2>ทีมและนักแข่งปัจจุบัน</h2>
+    <p>จัดกลุ่มจากข้อมูลนักแข่งของเซสชันล่าสุดบน OpenF1 — สีทีมเป็นสีหลักจริงที่ใช้ในถ่ายทอดสด</p>
+  </div>
+  <div class="teams-grid" id="teamsGrid">
+    <div class="skeleton" style="height:190px"></div>
+    <div class="skeleton" style="height:190px"></div>
+    <div class="skeleton" style="height:190px"></div>
+    <div class="skeleton" style="height:190px"></div>
+  </div>
+</section>
+
+<section id="standings">
+  <div class="sec-head">
+    <p class="sec-kicker">Championship</p>
+    <h2>อันดับความแชมป์โลก</h2>
+    <p>คำนวณจากผลการแข่งขันจริงทุกสนามของฤดูกาล (รวมสปรินต์) — คะแนนตามระบบ F1</p>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="drivers" type="button">🪖 นักแข่ง</button>
+    <button class="tab-btn" data-tab="constructors" type="button">🏁 ทีมผู้ผลิต</button>
+  </div>
+  <div class="st-panel show" id="panel-drivers">
+    <div class="st-list" id="driversList">
+      <div class="skeleton" style="height:68px;margin-bottom:10px"></div>
+      <div class="skeleton" style="height:68px;margin-bottom:10px"></div>
+      <div class="skeleton" style="height:68px;margin-bottom:10px"></div>
+      <div class="skeleton" style="height:68px;margin-bottom:10px"></div>
+      <div class="skeleton" style="height:68px"></div>
+    </div>
+  </div>
+  <div class="st-panel" id="panel-constructors"><div class="st-list" id="constructorsList"></div></div>
+</section>
+
+<section id="calendar">
+  <div class="sec-head">
+    <p class="sec-kicker">Race Calendar</p>
+    <h2>ปฏิทินการแข่งขัน</h2>
+    <p>สนามที่แข่งจบแล้วจะแสดงผู้ชนะจริง ส่วนสนามถัดไปจะถูกไฮไลต์ด้วยสีแดง</p>
+  </div>
+  <div class="season-progress">
+    <div class="sp-line"><span>ความคืบหน้าฤดูกาล</span><b id="spText">– / – สนาม</b></div>
+    <div class="sp-track"><div class="sp-fill" id="spFill" style="width:0"></div></div>
+  </div>
+  <div class="race-list" id="raceList">
+    <div class="skeleton" style="height:74px;margin-bottom:12px"></div>
+    <div class="skeleton" style="height:74px;margin-bottom:12px"></div>
+    <div class="skeleton" style="height:74px;margin-bottom:12px"></div>
+    <div class="skeleton" style="height:74px"></div>
+  </div>
+</section>
+
+<section id="facts">
+  <div class="sec-head">
+    <p class="sec-kicker">New Era</p>
+    <h2>ยุคใหม่แห่ง F1 ปี 2026</h2>
+    <p>กติกาใหม่ครั้งใหญ่ที่สุดในรอบหลายทศวรรษ เปลี่ยนทั้งเครื่องยนต์ เชื้อเพลิง และตัวรถ</p>
+  </div>
+  <div class="facts-grid">
+    <div class="fact-card reveal">
+      <div class="fact-ico">⚙️</div>
+      <h3>เครื่องยนต์ยุคใหม่</h3>
+      <p>เครื่องยนต์ V6 เทอร์โบไฮบริดปรับปรุงใหม่ทั้งหมด เพิ่มสัดส่วนพลังไฟฟ้าเกือบ 50% ของพลังรวม พร้อมตัดระบบ MGU-H ออก</p>
+    </div>
+    <div class="fact-card reveal">
+      <div class="fact-ico">🌱</div>
+      <h3>เชื้อเพลิง 100% ยั่งยืน</h3>
+      <p>ทุกทีมใช้เชื้อเพลิงยั่งยืนโดยสมบูรณ์ ก้าวสำคัญสู่เป้าหมาย Net Zero ภายในปี 2030</p>
+    </div>
+    <div class="fact-card reveal">
+      <div class="fact-ico">🌀</div>
+      <h3>Active Aerodynamics</h3>
+      <p>รถปี 2026 มีระบบปีกเคลื่อนไหว X-Mode สำหรับเส้นตรงและ Z-Mode สำหรับโค้ง ช่วยให้แซงกันได้บ่อยขึ้น</p>
+    </div>
+    <div class="fact-card reveal">
+      <div class="fact-ico">🇺🇸</div>
+      <h3>ทีมใหม่: Cadillac</h3>
+      <p>Cadillac ทีมสัญชาติอเมริกัน เข้าร่วมเป็นทีมที่ 11 ทำให้กริดมีนักแข่งถึง 22 คน</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="checkers"></div>
+  <div class="f-logo">F1<b>ZONE</b></div>
+  <p>เว็บไซต์แฟนเพจเพื่อความบันเทิงและการศึกษา — ข้อมูลการแข่งขันทั้งหมดดึงจาก <a href="https://openf1.org" target="_blank" rel="noopener" style="color:#e10600">OpenF1 API (openf1.org)</a></p>
+  <p id="updatedAt" class="muted" style="margin-top:6px"></p>
+  <p style="margin-top:10px">Formula 1, F1 และเครื่องหมายที่เกี่ยวข้อง เป็นทรัพย์สินของ Formula One Licensing BV</p>
+</footer>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
